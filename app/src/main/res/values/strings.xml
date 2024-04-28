@@ -1,0 +1,27 @@
+<resources>
+    <string name="app_name">Dacontrolagent</string>
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment">Hello blankdddddddddddddddddddfragment</string>
+    <string name="itinerary">ITINERARY</string>
+    <string name="loginMessage">Connect using the credentials provided by your dispatcher to start your tour.</string>
+    <string name="login">LOGIN</string>
+    <string name="go">GO</string>
+    <string name="scan">SCAN</string>
+    <string name="detailsBar">details</string>
+    <string name="packages_remaining">packages remaining</string>
+    <string name="packages_delivered">packages delivered</string>
+    <string name="close_nav">close</string>
+    <string name="open_nav">open</string>
+    <string name="update">Update</string>
+    <string name="done">It\'s OK</string>
+    <string name="delivered_package">This packages has been delivered ! Congrats</string>
+    <string name="mail">Mail</string>
+    <string name="password">Password</string>
+    <string name="log_in">Log in</string>
+    <string name="call">CALL</string>
+    <string name="no_routes">No itinerary yet ! Your routes will display when it is set</string>
+    <string name="gg_maps_not_found">Google maps isn\'t installed in your phone</string>
+    <string name="scan_data">Scan the bar code and take a picture of delivery</string>
+    <string name="invalid_packages">invalid packages</string>
+    <string name="authentication_unsuccessful">Authentication unsuccessful.</string>
+</resources>
