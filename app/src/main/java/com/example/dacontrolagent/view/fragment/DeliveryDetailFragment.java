@@ -59,56 +59,59 @@ public class DeliveryDetailFragment extends Fragment implements LocationListener
     private LocationManager locationManager;
     private GoogleMap googleMap;
     private Circle currentCircle;
-    private ActivityResultLauncher<Void> cameraLauncher;
-
     private RelativeLayout deliveryDataContainer;
     private Button goButton;
+    private ActivityResultLauncher<Void> cameraLauncher;
     private Button callButton;
+
+    ActivityResultLauncher<ScanOptions> barLauncher = registerForActivityResult(new ScanContract(), result -> {
+        if (result.getContents() != null && result.getContents().equalsIgnoreCase(delivery.getPackageNumber())) {
+            if (ContextCompat.checkSelfPermission(requireContext(), Manifest.permission.CAMERA) == PackageManager.PERMISSION_GRANTED) {
+                // Lancez l'activité de la caméra
+                Toast.makeText(getActivity(), result.getContents(), Toast.LENGTH_LONG).show();
+                cameraLauncher.launch(null);
+            } else {
+                // demander d'activé
+            }
+        } else {
+            Toast.makeText(getActivity(), R.string.invalid_packages, Toast.LENGTH_LONG).show();
+        }
+    });
 
     public DeliveryDetailFragment(Delivery delivery, TextView appBarText) {
         this.delivery = delivery;
         this.appBarText = appBarText;
     }
 
-
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         subscriptionToLocationService();
-        cameraLauncher = registerForActivityResult(new ActivityResultContracts.TakePicturePreview(), new ActivityResultCallback<Bitmap>() {
-            @Override
-            public void onActivityResult(Bitmap result) {
-                if (result != null) {
-                    delivery.setPhotoOfPackage(bitmapToBytes(result));
-                    FinalDeliveryCheckFragment fragment = new FinalDeliveryCheckFragment(delivery, appBarText);
-                    getActivity().getSupportFragmentManager()
-                            .beginTransaction()
-                            .replace(R.id.itineraryActivity, fragment)
-                            .commit();
-                }
+        cameraLauncher = registerForActivityResult(new ActivityResultContracts.TakePicturePreview(), result -> {
+
+            if (result != null) {
+                delivery.setPhotoOfPackage(bitmapToBytes(result));
+                FinalDeliveryCheckFragment fragment = new FinalDeliveryCheckFragment(delivery, appBarText);
+                getActivity().getSupportFragmentManager()
+                        .beginTransaction()
+                        .replace(R.id.itineraryActivity, fragment)
+                        .commit();
             }
         });
+
         return inflater.inflate(R.layout.fragment_delivery_detail, container, false);
     }
 
-    public static byte[] bitmapToBytes(Bitmap bitmap) {
-        ByteArrayOutputStream stream = new ByteArrayOutputStream();
-        bitmap.compress(Bitmap.CompressFormat.PNG, 100, stream);
-        return stream.toByteArray();
-    }
+
 
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
         ConfigureGoogleMap();
+        initViews(view);
 
         CustomizationView.of(appBarText)
                 .text(R.string.detailsBar);
-
-
-        goButton = view.findViewById(R.id.goButton);
-        callButton = view.findViewById(R.id.callButton);
-
 
         TextView nameTextView = new TextView(getActivity());
         CustomizationView.of(nameTextView)
@@ -133,13 +136,18 @@ public class DeliveryDetailFragment extends Fragment implements LocationListener
                 .orientation(VERTICAL)
                 .withChild(nameTextView, addressTextView, packageNumberTextView);
 
-        deliveryDataContainer = view.findViewById(R.id.deliveryDetails);
         CustomizationView.of(deliveryDataContainer)
                 .width(MATCH_PARENT)
                 .height(MATCH_PARENT)
                 .padding(20, 20, 20, 20)
                 .withChild(textContainer);
 
+    }
+
+    private void initViews(@NonNull View view) {
+        goButton = view.findViewById(R.id.goButton);
+        callButton = view.findViewById(R.id.callButton);
+        deliveryDataContainer = view.findViewById(R.id.deliveryDetails);
     }
 
     private void ConfigureGoogleMap() {
@@ -149,7 +157,6 @@ public class DeliveryDetailFragment extends Fragment implements LocationListener
         }
     }
 
-
     @Override
     public void onPause() {
         if (locationManager != null) {
@@ -157,7 +164,6 @@ public class DeliveryDetailFragment extends Fragment implements LocationListener
         }
         super.onPause();
     }
-
 
     @Override
     public void onLocationChanged(@NonNull Location location) {
@@ -200,23 +206,9 @@ public class DeliveryDetailFragment extends Fragment implements LocationListener
         options.setCaptureActivity(CaptureAct.class);
 
         barLauncher.launch(options);
-
     }
 
 
-    ActivityResultLauncher<ScanOptions> barLauncher = registerForActivityResult(new ScanContract(), result -> {
-        if (result.getContents() != null && result.getContents().equalsIgnoreCase(delivery.getPackageNumber())) {
-            if (ContextCompat.checkSelfPermission(requireContext(), Manifest.permission.CAMERA) == PackageManager.PERMISSION_GRANTED) {
-                // Lancez l'activité de la caméra
-                Toast.makeText(getActivity(), result.getContents(), Toast.LENGTH_LONG).show();
-                cameraLauncher.launch(null);
-            } else {
-                // demander d'activé
-            }
-        } else {
-            Toast.makeText(getActivity(), R.string.invalid_packages, Toast.LENGTH_LONG).show();
-        }
-    });
 
     private void updateMap(LatLng currentLatLng) {
         if (googleMap != null) {
@@ -255,6 +247,12 @@ public class DeliveryDetailFragment extends Fragment implements LocationListener
 
         MarkerOptions marker = new MarkerOptions().position(position).title(delivery.getName());
         googleMap.addMarker(marker);
+    }
+
+    private static byte[] bitmapToBytes(Bitmap bitmap) {
+        ByteArrayOutputStream stream = new ByteArrayOutputStream();
+        bitmap.compress(Bitmap.CompressFormat.PNG, 100, stream);
+        return stream.toByteArray();
     }
 
 }

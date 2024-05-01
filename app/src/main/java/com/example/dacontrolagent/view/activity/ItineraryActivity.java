@@ -65,9 +65,6 @@ public class ItineraryActivity extends AppCompatActivity implements LocationList
         drawerLayout.addDrawerListener(toggle);
         toggle.syncState();
 
-
-
-
         appBarText = findViewById(R.id.appBarText);
 
         deliveryViewModel = new ViewModelProvider(this).get(DeliveryViewModel.class);

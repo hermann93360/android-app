@@ -1,6 +1,5 @@
 package com.example.dacontrolagent.view.fragment;
 
-import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.os.Bundle;
 
@@ -47,11 +46,7 @@ public class FinalDeliveryCheckFragment extends Fragment {
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
-
-        deliveryViewModel = new ViewModelProvider(requireActivity()).get(DeliveryViewModel.class);
-
-        container = view.findViewById(R.id.container);
-        submit = view.findViewById(R.id.bottomBtn);
+        initViews(view);
 
         if(delivery.isDelivered()) {
             TextView packageDelivered = new TextView(getActivity());
@@ -78,4 +73,9 @@ public class FinalDeliveryCheckFragment extends Fragment {
         photoOfPackage.setImageBitmap(BitmapFactory.decodeByteArray(delivery.getPhotoOfPackage(), 0, delivery.getPhotoOfPackage().length));
     }
 
+    private void initViews(@NonNull View view) {
+        deliveryViewModel = new ViewModelProvider(requireActivity()).get(DeliveryViewModel.class);
+        container = view.findViewById(R.id.container);
+        submit = view.findViewById(R.id.bottomBtn);
+    }
 }
