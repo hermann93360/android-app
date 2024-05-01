@@ -1,7 +1,5 @@
 package com.example.dacontrolagent.domain.repository.impl;
 
-import static java.util.Collections.singletonList;
-
 import com.example.dacontrolagent.domain.model.Delivery;
 import com.example.dacontrolagent.domain.model.User;
 import com.example.dacontrolagent.domain.repository.DeliveryRepository;
@@ -9,7 +7,6 @@ import com.example.dacontrolagent.domain.repository.UserRepository;
 
 import java.time.LocalDate;
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -25,8 +22,8 @@ public class InMemory implements UserRepository, DeliveryRepository {
                     "32 Rue du Colonel Moll, 93330 Neuilly-sur-Marne",
                     2.5347545164121548F,
                     48.859834124187934F,
-                    0
-            ),
+                    0,
+                    "+33760405709"),
             new Delivery(
                     "test@test.com",
                     "PKG124545",
@@ -35,8 +32,8 @@ public class InMemory implements UserRepository, DeliveryRepository {
                     "6 Av Danielle Casanova",
                     123.456F,
                     45.67F,
-                    0
-            )
+                    0,
+                    "+33760405709")
     );
     @Override
     public User findUserByEmail(String email) {

@@ -22,6 +22,7 @@ import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
 
@@ -67,7 +68,6 @@ public class DeliveryDetailFragment extends Fragment implements LocationListener
     ActivityResultLauncher<ScanOptions> barLauncher = registerForActivityResult(new ScanContract(), result -> {
         if (result.getContents() != null && result.getContents().equalsIgnoreCase(delivery.getPackageNumber())) {
             if (ContextCompat.checkSelfPermission(requireContext(), Manifest.permission.CAMERA) == PackageManager.PERMISSION_GRANTED) {
-                // Lancez l'activité de la caméra
                 Toast.makeText(getActivity(), result.getContents(), Toast.LENGTH_LONG).show();
                 cameraLauncher.launch(null);
             } else {
@@ -87,6 +87,7 @@ public class DeliveryDetailFragment extends Fragment implements LocationListener
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         subscriptionToLocationService();
+
         cameraLauncher = registerForActivityResult(new ActivityResultContracts.TakePicturePreview(), result -> {
 
             if (result != null) {
@@ -94,7 +95,7 @@ public class DeliveryDetailFragment extends Fragment implements LocationListener
                 FinalDeliveryCheckFragment fragment = new FinalDeliveryCheckFragment(delivery, appBarText);
                 getActivity().getSupportFragmentManager()
                         .beginTransaction()
-                        .replace(R.id.itineraryActivity, fragment)
+                        .replace(R.id.fragment_container, fragment)
                         .commit();
             }
         });
@@ -103,12 +104,22 @@ public class DeliveryDetailFragment extends Fragment implements LocationListener
     }
 
 
-
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
         ConfigureGoogleMap();
         initViews(view);
+        callButton.setOnClickListener(v -> {
+            Intent intent = new Intent(Intent.ACTION_CALL);
+            intent.setData(Uri.parse("tel:" + "+33760405709"));
+            if (ContextCompat.checkSelfPermission(getContext(), Manifest.permission.CALL_PHONE) != PackageManager.PERMISSION_GRANTED) {
+                ActivityCompat.requestPermissions(getActivity(), new String[]{
+                        Manifest.permission.CALL_PHONE,
+                }, 10);
+            } else {
+                startActivity(intent);
+            }
+        });
 
         CustomizationView.of(appBarText)
                 .text(R.string.detailsBar);
@@ -207,7 +218,6 @@ public class DeliveryDetailFragment extends Fragment implements LocationListener
 
         barLauncher.launch(options);
     }
-
 
 
     private void updateMap(LatLng currentLatLng) {

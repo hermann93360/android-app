@@ -10,9 +10,10 @@ public class Delivery {
     private final float latitude;
     private byte[] photoOfPackage;
     private boolean delivered;
+    private final String phoneNumber;
 
 
-    public Delivery(String emailOfDeliver, String packageNumber, String name, String salutation, String address, float longitude, float latitude, byte[] photoOfPackage, boolean delivered) {
+    public Delivery(String emailOfDeliver, String packageNumber, String name, String salutation, String address, float longitude, float latitude, byte[] photoOfPackage, boolean delivered, String phoneNumber) {
         this.emailOfDeliver = emailOfDeliver;
         this.packageNumber = packageNumber;
         this.name = name;
@@ -22,9 +23,10 @@ public class Delivery {
         this.latitude = latitude;
         this.photoOfPackage = photoOfPackage;
         this.delivered = delivered;
+        this.phoneNumber = phoneNumber;
     }
 
-    public Delivery(String emailOfDeliver, String packageNumber, String name, String salutation, String address, float longitude, float latitude, int delivered) {
+    public Delivery(String emailOfDeliver, String packageNumber, String name, String salutation, String address, float longitude, float latitude, int delivered, String phoneNumber) {
         this.emailOfDeliver = emailOfDeliver;
         this.packageNumber = packageNumber;
         this.name = name;
@@ -33,6 +35,7 @@ public class Delivery {
         this.longitude = longitude;
         this.latitude = latitude;
         this.delivered = delivered == 1;
+        this.phoneNumber = phoneNumber;
     }
 
     public String getEmailOfDeliver() {
@@ -69,6 +72,10 @@ public class Delivery {
 
     public byte[] getPhotoOfPackage() {
         return photoOfPackage;
+    }
+
+    public String getPhoneNumber() {
+        return phoneNumber;
     }
 
     public void setDelivered(boolean delivered) {

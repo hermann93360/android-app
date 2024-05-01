@@ -9,10 +9,11 @@
     android:layout_height="match_parent"
     tools:context=".view.activity.ItineraryActivity">
 
-    <RelativeLayout
+    <LinearLayout
         android:id="@+id/itineraryActivity"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
+        android:orientation="vertical"
         >
 
         <com.google.android.material.appbar.AppBarLayout
@@ -26,7 +27,6 @@
                 android:layout_height="?attr/actionBarSize"
                 android:background="@color/black"
                 app:menu="@menu/app_bar_menu"
-                app:navigationIcon="@drawable/baseline_apps_24"
                 app:popupTheme="@style/Base.Theme.Dacontrolagent"
                 app:titleTextColor="@color/white">
 
@@ -35,22 +35,31 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:fontFamily="@font/poppins_light"
+                    android:letterSpacing="0.3"
                     android:lineSpacingExtra="34sp"
                     android:text="@string/itinerary"
-                    android:textAlignment="center"
                     android:textColor="#FFFFFF"
-                    android:letterSpacing="0.3"
                     android:textSize="15sp" />
 
             </com.google.android.material.appbar.MaterialToolbar>
 
-
-
-
         </com.google.android.material.appbar.AppBarLayout>
 
 
+        <FrameLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:id="@+id/fragment_container" />
+    </LinearLayout>
 
-    </RelativeLayout>
+    <com.google.android.material.navigation.NavigationView
+        android:layout_width="wrap_content"
+        android:layout_height="match_parent"
+        android:id="@+id/nav_view"
+        android:layout_gravity="start"
+        app:menu="@menu/app_bar_menu"
+        app:itemIconTint="@color/colorPrimary"/>
+
+
 
 </androidx.drawerlayout.widget.DrawerLayout>

@@ -13,7 +13,6 @@ import com.example.dacontrolagent.R;
 public class NoRouteFragment extends Fragment {
 
     public NoRouteFragment() {
-        // Required empty public constructor
     }
 
     @Override

@@ -64,7 +64,7 @@ public class FinalDeliveryCheckFragment extends Fragment {
                 ListOfDeliveryFragment fragment = new ListOfDeliveryFragment(appBarText);
                 getActivity().getSupportFragmentManager()
                         .beginTransaction()
-                        .replace(R.id.itineraryActivity, fragment)
+                        .replace(R.id.fragment_container, fragment)
                         .commit();
             });
         }

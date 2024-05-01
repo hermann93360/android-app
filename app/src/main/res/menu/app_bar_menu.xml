@@ -7,9 +7,16 @@
         android:checkableBehavior="single">
 
         <item
-            android:id="@+id/home"
-            android:title="TODO" />
+            android:id="@+id/itineraryNav"
+            android:title="@string/itinerary" />
 
+        <item
+            android:id="@+id/myAccountNav"
+            android:title="@string/my_account" />
+
+        <item
+            android:id="@+id/logoutNav"
+            android:title="@string/log_out" />
 
     </group>
 </menu>

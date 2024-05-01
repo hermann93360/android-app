@@ -2,12 +2,15 @@ package com.example.dacontrolagent.view.activity;
 
 import android.Manifest;
 import android.content.Context;
+import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
 import android.os.Build;
 import android.os.Bundle;
+import android.util.Log;
+import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
@@ -20,6 +23,7 @@ import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.ActionBarDrawerToggle;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
+import androidx.core.content.ContextCompat;
 import androidx.core.view.GravityCompat;
 import androidx.drawerlayout.widget.DrawerLayout;
 import androidx.fragment.app.Fragment;
@@ -33,15 +37,19 @@ import com.example.dacontrolagent.view.fragment.ListOfDeliveryFragment;
 import com.example.dacontrolagent.view.fragment.NoRouteFragment;
 import com.example.dacontrolagent.R;
 import com.example.dacontrolagent.viewmodel.DeliveryViewModel;
+import com.example.dacontrolagent.viewmodel.UserViewModel;
+import com.example.dacontrolagent.viewmodel.sqlLite.UserLoggedManager;
 import com.google.android.material.appbar.MaterialToolbar;
+import com.google.android.material.internal.NavigationMenuView;
 import com.google.android.material.navigation.NavigationView;
 
 import java.time.LocalDate;
 import java.util.List;
 
-public class ItineraryActivity extends AppCompatActivity implements LocationListener, NavigationView.OnNavigationItemSelectedListener {
+public class ItineraryActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener {
 
     private DeliveryViewModel deliveryViewModel;
+    private UserLoggedManager userLoggedManager;
 
     private DrawerLayout drawerLayout;
     private TextView appBarText;
@@ -55,19 +63,24 @@ public class ItineraryActivity extends AppCompatActivity implements LocationList
         super.onCreate(savedInstanceState);
         EdgeToEdge.enable(this);
         setContentView(R.layout.activity_itinerary);
+        checkPermissions();
+
+        userLoggedManager = new UserLoggedManager(this);
+        deliveryViewModel = new ViewModelProvider(this).get(DeliveryViewModel.class);
 
         MaterialToolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
         drawerLayout = findViewById(R.id.drawer);
 
+        NavigationView navigationView = findViewById(R.id.nav_view);
+        navigationView.setNavigationItemSelectedListener(this);
 
         ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(this, drawerLayout, toolbar, R.string.open_nav, R.string.close_nav);
         drawerLayout.addDrawerListener(toggle);
         toggle.syncState();
+        toggle.getDrawerArrowDrawable().setColor(ContextCompat.getColor(this, R.color.white));
 
         appBarText = findViewById(R.id.appBarText);
-
-        deliveryViewModel = new ViewModelProvider(this).get(DeliveryViewModel.class);
 
         deliveryViewModel.getLiveDeliveries().observe(this, deliveries -> {
             Fragment fragment;
@@ -77,7 +90,7 @@ public class ItineraryActivity extends AppCompatActivity implements LocationList
                 fragment = new ListOfDeliveryFragment(deliveries, appBarText);
             }
             FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
-            transaction.replace(R.id.itineraryActivity, fragment);
+            transaction.replace(R.id.fragment_container, fragment);
             transaction.commit();
         });
 
@@ -91,12 +104,14 @@ public class ItineraryActivity extends AppCompatActivity implements LocationList
     public void checkPermissions() {
         if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED &&
                 ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED &&
+                ActivityCompat.checkSelfPermission(this, Manifest.permission.CALL_PHONE) != PackageManager.PERMISSION_GRANTED &&
                 ActivityCompat.checkSelfPermission(this, Manifest.permission.CAMERA) != PackageManager.PERMISSION_GRANTED) {
 
             ActivityCompat.requestPermissions(this, new String[]{
                     Manifest.permission.ACCESS_FINE_LOCATION,
                     Manifest.permission.ACCESS_COARSE_LOCATION,
-                    Manifest.permission.CAMERA
+                    Manifest.permission.CAMERA,
+                    Manifest.permission.CALL_PHONE,
             }, 10);
         }
     }
@@ -116,50 +131,58 @@ public class ItineraryActivity extends AppCompatActivity implements LocationList
     }
 
     @Override
-    public void onLocationChanged(@NonNull Location location) {
-        //double latitude = location.getLatitude();
-        //double longitude = location.getLongitude();
-
-        //Toast.makeText(this, "Location " + latitude, Toast.LENGTH_LONG).show();
+    public boolean onCreateOptionsMenu(Menu menu) {
+        getMenuInflater().inflate(R.menu.app_bar_menu, menu);
+        return true;
     }
 
     @Override
-    public void onLocationChanged(@NonNull List<Location> locations) {
-        LocationListener.super.onLocationChanged(locations);
-    }
+    public boolean onOptionsItemSelected(@NonNull MenuItem item) {
 
-    @Override
-    public void onFlushComplete(int requestCode) {
-        LocationListener.super.onFlushComplete(requestCode);
-    }
+        if (item.getItemId() == R.id.itineraryNav) {
+            getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container, new ListOfDeliveryFragment(deliveryViewModel.getLiveDeliveries().getValue(), appBarText)).commit();
+        } else if (item.getItemId() == R.id.myAccountNav) {
+            Toast.makeText(this, R.string.page_not_created, Toast.LENGTH_LONG).show();
+        } else if (item.getItemId() == R.id.logoutNav) {
+            userLoggedManager.deleteUser();
+            getSharedPreferences("AppPref", MODE_PRIVATE).edit().remove("isLoggedIn").remove("emailOfLoggedPerson").apply();
+            Intent intentToLogin = new Intent(ItineraryActivity.this, MainActivity.class);
+            startActivity(intentToLogin);
+        }
+        else {
+            drawerLayout.closeDrawer(GravityCompat.START);
+        }
 
-    @Override
-    public void onStatusChanged(String provider, int status, Bundle extras) {
-        LocationListener.super.onStatusChanged(provider, status, extras);
-    }
-
-    @Override
-    public void onProviderEnabled(@NonNull String provider) {
-        LocationListener.super.onProviderEnabled(provider);
-    }
-
-    @Override
-    public void onProviderDisabled(@NonNull String provider) {
-        LocationListener.super.onProviderDisabled(provider);
-    }
-
-    @Override
-    public void onPointerCaptureChanged(boolean hasCapture) {
-        super.onPointerCaptureChanged(hasCapture);
+        drawerLayout.closeDrawer(GravityCompat.START);
+        return true;
     }
 
     @Override
     public boolean onNavigationItemSelected(@NonNull MenuItem menuItem) {
-        return false;
+        if (menuItem.getItemId() == R.id.itineraryNav) {
+            getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container, new ListOfDeliveryFragment(deliveryViewModel.getLiveDeliveries().getValue(), appBarText)).commit();
+        } else if (menuItem.getItemId() == R.id.myAccountNav) {
+            Toast.makeText(this, R.string.page_not_created, Toast.LENGTH_LONG).show();
+        } else if (menuItem.getItemId() == R.id.logoutNav) {
+            userLoggedManager.deleteUser();
+            getSharedPreferences("AppPref", MODE_PRIVATE).edit().remove("isLoggedIn").remove("emailOfLoggedPerson").apply();
+            Intent intentToLogin = new Intent(ItineraryActivity.this, MainActivity.class);
+            startActivity(intentToLogin);
+        }
+        else {
+            drawerLayout.closeDrawer(GravityCompat.START);
+        }
+
+        drawerLayout.closeDrawer(GravityCompat.START);
+        return true;
     }
 
     @Override
     public void onBackPressed() {
-        super.onBackPressed();
+        if(drawerLayout.isDrawerOpen(GravityCompat.START)) {
+            drawerLayout.closeDrawer(GravityCompat.START);
+        } else {
+            super.onBackPressed();
+        }
     }
 }

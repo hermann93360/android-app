@@ -155,13 +155,13 @@ public class ListOfDeliveryFragment extends Fragment {
                     DeliveryDetailFragment fragment = new DeliveryDetailFragment(delivery, appBarText);
                     getActivity().getSupportFragmentManager()
                             .beginTransaction()
-                            .replace(R.id.itineraryActivity, fragment)
+                            .replace(R.id.fragment_container, fragment)
                             .commit();
                 } else {
                     FinalDeliveryCheckFragment fragment = new FinalDeliveryCheckFragment(delivery, appBarText);
                     getActivity().getSupportFragmentManager()
                             .beginTransaction()
-                            .replace(R.id.itineraryActivity, fragment)
+                            .replace(R.id.fragment_container, fragment)
                             .commit();
                 }
 
